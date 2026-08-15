@@ -86,7 +86,11 @@
 
   async function init() {
     await requireLogin();
-    animalModal = new bootstrap.Modal(document.getElementById("animalModal"));
+    if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+      animalModal = new bootstrap.Modal(document.getElementById("animalModal"));
+    } else {
+      showToast("Bootstrap libraries are unavailable. Refresh once the browser can load the UI assets.", true);
+    }
     loadAnimals();
   }
 

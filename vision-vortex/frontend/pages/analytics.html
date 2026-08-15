@@ -52,22 +52,26 @@
       const res = await apiRequest("/dashboard");
       const d = res.data;
 
-      new Chart(document.getElementById("healthChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Healthy", "Sick / Under Treatment"],
-          datasets: [{ data: [d.healthyAnimals, d.sickAnimals], backgroundColor: ["#1e8449", "#c0392b"] }],
-        },
-      });
+      if (typeof Chart !== "undefined") {
+        new Chart(document.getElementById("healthChart"), {
+          type: "doughnut",
+          data: {
+            labels: ["Healthy", "Sick / Under Treatment"],
+            datasets: [{ data: [d.healthyAnimals, d.sickAnimals], backgroundColor: ["#1e8449", "#c0392b"] }],
+          },
+        });
 
-      new Chart(document.getElementById("usageChart"), {
-        type: "bar",
-        data: {
-          labels: d.monthlyMedicineUsage.map((m) => m.month),
-          datasets: [{ label: "Medicine records", data: d.monthlyMedicineUsage.map((m) => m.count), backgroundColor: "#2e86c1" }],
-        },
-        options: { plugins: { legend: { display: false } } },
-      });
+        new Chart(document.getElementById("usageChart"), {
+          type: "bar",
+          data: {
+            labels: d.monthlyMedicineUsage.map((m) => m.month),
+            datasets: [{ label: "Medicine records", data: d.monthlyMedicineUsage.map((m) => m.count), backgroundColor: "#2e86c1" }],
+          },
+          options: { plugins: { legend: { display: false } } },
+        });
+      } else {
+        showToast("Chart library is unavailable. Analytics charts are not available in this browser context.", true);
+      }
     } catch (err) {
       showToast(err.message, true);
     }

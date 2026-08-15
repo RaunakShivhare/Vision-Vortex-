@@ -85,7 +85,11 @@
 
   async function init() {
     await requireLogin();
-    medModal = new bootstrap.Modal(document.getElementById("medModal"));
+    if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+      medModal = new bootstrap.Modal(document.getElementById("medModal"));
+    } else {
+      showToast("Bootstrap libraries are unavailable. Refresh once the browser can load the UI assets.", true);
+    }
     await loadAnimalsDropdown();
     loadMedicines();
   }

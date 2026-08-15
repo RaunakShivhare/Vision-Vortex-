@@ -67,7 +67,11 @@
 
   async function init() {
     await requireLogin();
-    invModal = new bootstrap.Modal(document.getElementById("invModal"));
+    if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+      invModal = new bootstrap.Modal(document.getElementById("invModal"));
+    } else {
+      showToast("Bootstrap libraries are unavailable. Refresh once the browser can load the UI assets.", true);
+    }
     loadInventory();
   }
 

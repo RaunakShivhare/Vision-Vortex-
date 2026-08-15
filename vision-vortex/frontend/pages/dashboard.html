@@ -95,11 +95,15 @@
       // chart
       const labels = d.monthlyMedicineUsage.map((m) => m.month);
       const values = d.monthlyMedicineUsage.map((m) => m.count);
-      new Chart(document.getElementById("usageChart"), {
-        type: "bar",
-        data: { labels, datasets: [{ label: "Medicine records", data: values, backgroundColor: "#1e8449" }] },
-        options: { responsive: true, plugins: { legend: { display: false } } },
-      });
+      if (typeof Chart !== "undefined") {
+        new Chart(document.getElementById("usageChart"), {
+          type: "bar",
+          data: { labels, datasets: [{ label: "Medicine records", data: values, backgroundColor: "#1e8449" }] },
+          options: { responsive: true, plugins: { legend: { display: false } } },
+        });
+      } else {
+        showToast("Chart library is unavailable. The dashboard data loaded, but charts are disabled.", false);
+      }
     } catch (err) {
       showToast(err.message, true);
     }

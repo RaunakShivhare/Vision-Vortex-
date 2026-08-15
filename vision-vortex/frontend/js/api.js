@@ -11,12 +11,29 @@ async function apiRequest(endpoint, method = "GET", body = null) {
   };
   if (body) options.body = JSON.stringify(body);
 
-  const response = await fetch(API_BASE + endpoint, options);
-  const data = await response.json();
+  let response;
+  try {
+    response = await fetch(API_BASE + endpoint, options);
+  } catch (err) {
+    throw new Error("Unable to reach the Vision Vortex backend. Start the Node API server on http://localhost:5000.");
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  let data;
+
+  if (contentType.includes("application/json")) {
+    data = await response.json();
+  } else {
+    const text = await response.text();
+    data = {
+      success: false,
+      message: text ? text.slice(0, 160) : "The request did not return JSON data.",
+    };
+  }
 
   if (!response.ok) {
     // throw so that calling code's try/catch can show the message
-    throw new Error(data.message || "Something went wrong");
+    throw new Error(data.message || `Request failed with HTTP ${response.status}`);
   }
   return data;
 }
