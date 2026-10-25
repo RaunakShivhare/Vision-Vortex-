@@ -28,7 +28,9 @@
 ====================================================================
 """
 
-from flask import Flask, request
+import os
+
+from flask import Flask
 
 app = Flask(__name__)
 
@@ -775,7 +777,7 @@ def faq():
 # 4. 404 PAGE
 # --------------------------------------------------------------
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(_error):
     body = """
     <div style="text-align:center;padding:60px 20px;">
         <h1 style="font-size:70px;color:#16a34a;margin-bottom:0;">404</h1>
@@ -791,4 +793,4 @@ def page_not_found(e):
 # --------------------------------------------------------------
 if __name__ == "__main__":
     # debug=True just so the server auto-reloads while I was building this
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=int(os.environ.get("PORT", 5001)))

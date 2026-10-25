@@ -5,9 +5,20 @@
 const express = require("express");
 const pool = require("../config/db");
 const { requireLogin } = require("../middleware/authMiddleware");
+const { MAX_INT, validateDate, validateNumber } = require("../lib/validation");
 
 const router = express.Router();
 router.use(requireLogin);
+
+function validateMedicineFields({ animalId, medicineName, startDate, endDate, withdrawalDays }, requireAnimal = true) {
+  if (requireAnimal && (!animalId || !Number.isInteger(Number(animalId)) || Number(animalId) < 1)) return "Please select a valid animal";
+  if (typeof medicineName !== "string" || !medicineName.trim()) return "Medicine name is required";
+  if (medicineName.trim().length > 150) return "Medicine name must be 150 characters or fewer";
+  return validateDate(startDate, "Start date", { required: true })
+    || validateDate(endDate, "End date")
+    || validateNumber(withdrawalDays, "Withdrawal period", { integer: true, max: MAX_INT })
+    || (endDate && startDate && endDate < startDate ? "End date cannot be before start date" : null);
+}
 
 // helper function - adds "days" number of days to a date string and
 // returns a new date string in YYYY-MM-DD format
@@ -48,9 +59,8 @@ router.post("/", async (req, res) => {
   try {
     const { animalId, medicineName, isAntimicrobial, dosage, purpose, vetName, startDate, endDate, withdrawalDays } = req.body;
 
-    if (!animalId || !medicineName || !startDate) {
-      return res.status(400).json({ success: false, message: "Animal, medicine name and start date are required" });
-    }
+    const validationError = validateMedicineFields(req.body);
+    if (validationError) return res.status(400).json({ success: false, message: validationError });
 
     // Only calculate withdrawal end date if we know when the treatment ends
     const withdrawalEndDate = endDate ? addDays(endDate, withdrawalDays) : null;
@@ -84,6 +94,8 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { medicineName, isAntimicrobial, dosage, purpose, vetName, startDate, endDate, withdrawalDays } = req.body;
+    const validationError = validateMedicineFields(req.body, false);
+    if (validationError) return res.status(400).json({ success: false, message: validationError });
 
     const [existing] = await pool.query("SELECT * FROM medicines WHERE id = ? AND owner_id = ?", [
       req.params.id, req.session.user.id,

@@ -4,9 +4,23 @@
 const express = require("express");
 const pool = require("../config/db");
 const { requireLogin } = require("../middleware/authMiddleware");
+const { MAX_INT, MAX_WEIGHT, validateNumber } = require("../lib/validation");
 
 const router = express.Router();
 router.use(requireLogin); // every route below needs the user to be logged in
+const speciesValues = ["Cow", "Buffalo", "Goat", "Sheep", "Poultry", "Other"];
+const genderValues = ["Male", "Female"];
+const healthValues = ["Healthy", "Sick", "Under Treatment", "Critical"];
+
+function validateAnimalFields({ animalTag, species, age, weight, gender, healthStatus }, { requireTag = false } = {}) {
+  if (requireTag && (typeof animalTag !== "string" || !animalTag.trim())) return "Animal tag is required";
+  if (animalTag != null && (typeof animalTag !== "string" || animalTag.trim().length > 50)) return "Animal tag must be 50 characters or fewer";
+  if (!speciesValues.includes(species)) return "Please select a valid species";
+  if (gender && !genderValues.includes(gender)) return "Please select a valid gender";
+  if (healthStatus && !healthValues.includes(healthStatus)) return "Please select a valid health status";
+  return validateNumber(age, "Age", { integer: true, max: MAX_INT })
+    || validateNumber(weight, "Weight", { max: MAX_WEIGHT, decimalPlaces: 2 });
+}
 
 // GET all animals belonging to the logged-in user (supports simple search)
 router.get("/", async (req, res) => {
@@ -56,6 +70,8 @@ router.post("/", async (req, res) => {
     if (!animalTag || !species) {
       return res.status(400).json({ success: false, message: "Animal tag and species are required" });
     }
+    const validationError = validateAnimalFields(req.body, { requireTag: true });
+    if (validationError) return res.status(400).json({ success: false, message: validationError });
 
     const [result] = await pool.query(
       `INSERT INTO animals (owner_id, animal_tag, name, species, breed, age, gender, weight, health_status)
@@ -78,6 +94,8 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { name, species, breed, age, gender, weight, healthStatus } = req.body;
+    const validationError = validateAnimalFields(req.body);
+    if (validationError) return res.status(400).json({ success: false, message: validationError });
 
     const [existing] = await pool.query("SELECT id FROM animals WHERE id = ? AND owner_id = ?", [
       req.params.id,

@@ -65,7 +65,7 @@
           </div>
           <div class="mb-2">
             <label class="form-label">Withdrawal Period (days)</label>
-            <input type="number" class="form-control" id="withdrawalDays" value="0">
+            <input type="number" class="form-control" id="withdrawalDays" value="0" min="0" max="2147483647" step="1">
             <small class="text-muted">Ask your vet how many days are needed for this medicine. We will calculate the end date automatically.</small>
           </div>
           <button type="submit" class="btn btn-vv-primary w-100 mt-2">Save Record</button>
@@ -140,6 +140,7 @@
     editingId = null;
     document.getElementById("modalTitle").textContent = "Add Medicine Record";
     document.getElementById("medForm").reset();
+    document.getElementById("endDate").min = "";
   }
 
   function openEditModal(id) {
@@ -155,12 +156,19 @@
     document.getElementById("vetName").value = m.vet_name || "";
     document.getElementById("startDate").value = m.start_date ? m.start_date.slice(0,10) : "";
     document.getElementById("endDate").value = m.end_date ? m.end_date.slice(0,10) : "";
+    document.getElementById("endDate").min = document.getElementById("startDate").value;
     document.getElementById("withdrawalDays").value = m.withdrawal_days || 0;
     medModal.show();
   }
 
   document.getElementById("medForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+    if (startDate && endDate && endDate < startDate) {
+      showToast("End date cannot be before start date", true);
+      return;
+    }
     const payload = {
       animalId: document.getElementById("animalId").value,
       medicineName: document.getElementById("medicineName").value,
@@ -168,8 +176,8 @@
       dosage: document.getElementById("dosage").value,
       purpose: document.getElementById("purpose").value,
       vetName: document.getElementById("vetName").value,
-      startDate: document.getElementById("startDate").value,
-      endDate: document.getElementById("endDate").value,
+      startDate,
+      endDate,
       withdrawalDays: document.getElementById("withdrawalDays").value,
     };
     try {
@@ -185,6 +193,10 @@
     } catch (err) {
       showToast(err.message, true);
     }
+  });
+
+  document.getElementById("startDate").addEventListener("change", function () {
+    document.getElementById("endDate").min = this.value;
   });
 
   async function deleteMed(id) {

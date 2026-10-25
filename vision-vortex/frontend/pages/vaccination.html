@@ -123,6 +123,7 @@
     editingId = null;
     document.getElementById("modalTitle").textContent = "Schedule Vaccination";
     document.getElementById("vacForm").reset();
+    document.getElementById("nextDueDate").min = "";
   }
 
   function openEditModal(id) {
@@ -135,17 +136,24 @@
     document.getElementById("givenBy").value = v.given_by || "";
     document.getElementById("dateGiven").value = v.date_given.slice(0,10);
     document.getElementById("nextDueDate").value = v.next_due_date.slice(0,10);
+    document.getElementById("nextDueDate").min = document.getElementById("dateGiven").value;
     vacModal.show();
   }
 
   document.getElementById("vacForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+    const dateGiven = document.getElementById("dateGiven").value;
+    const nextDueDate = document.getElementById("nextDueDate").value;
+    if (dateGiven && nextDueDate && nextDueDate < dateGiven) {
+      showToast("Next due date cannot be before the date given", true);
+      return;
+    }
     const payload = {
       animalId: document.getElementById("animalId").value,
       vaccineName: document.getElementById("vaccineName").value,
       givenBy: document.getElementById("givenBy").value,
-      dateGiven: document.getElementById("dateGiven").value,
-      nextDueDate: document.getElementById("nextDueDate").value,
+      dateGiven,
+      nextDueDate,
     };
     try {
       if (editingId) {
@@ -160,6 +168,10 @@
     } catch (err) {
       showToast(err.message, true);
     }
+  });
+
+  document.getElementById("dateGiven").addEventListener("change", function () {
+    document.getElementById("nextDueDate").min = this.value;
   });
 
   async function deleteVac(id) {

@@ -59,8 +59,8 @@
           </div>
           <div class="mb-2"><label class="form-label">Breed</label><input class="form-control" id="breed"></div>
           <div class="row">
-            <div class="col mb-2"><label class="form-label">Age</label><input type="number" class="form-control" id="age"></div>
-            <div class="col mb-2"><label class="form-label">Weight (kg)</label><input type="number" class="form-control" id="weight"></div>
+            <div class="col mb-2"><label class="form-label">Age</label><input type="number" class="form-control" id="age" min="0" max="2147483647" step="1"></div>
+            <div class="col mb-2"><label class="form-label">Weight (kg)</label><input type="number" class="form-control" id="weight" min="0" max="9999.99" step="0.01"></div>
           </div>
           <div class="mb-2"><label class="form-label">Gender</label>
             <select class="form-select" id="gender"><option>Female</option><option>Male</option></select>
@@ -142,8 +142,8 @@
     document.getElementById("name").value = animal.name || "";
     document.getElementById("species").value = animal.species;
     document.getElementById("breed").value = animal.breed || "";
-    document.getElementById("age").value = animal.age || "";
-    document.getElementById("weight").value = animal.weight || "";
+    document.getElementById("age").value = animal.age ?? "";
+    document.getElementById("weight").value = animal.weight ?? "";
     document.getElementById("gender").value = animal.gender || "Female";
     document.getElementById("healthStatus").value = animal.health_status;
     animalModal.show();

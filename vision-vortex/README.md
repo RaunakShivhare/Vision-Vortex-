@@ -75,10 +75,15 @@ cd backend
 npm install
 cp .env.example .env
 ```
-Open `.env` and put in your own MySQL password:
+Open `.env` and set the credentials for your local MySQL installation:
 ```
+DB_HOST=localhost
+DB_USER=root
 DB_PASSWORD=your_mysql_password
 ```
+Make sure MySQL is running and `backend/db/schema.sql` has been applied before
+using database-backed features. The API health check works without a database,
+but login and other data routes require a valid database connection.
 Then run the seed script once, to create test accounts:
 ```bash
 npm run seed
@@ -98,6 +103,17 @@ The easiest way to run it is with the **Live Server** extension in VS Code:
 
 (If your Live Server opens on a different port, update `CLIENT_URL` in the
 backend's `.env` file to match, and restart the backend.)
+
+### Optional — run the standalone Python UI preview
+
+`app.py` is a separate demo UI with sample data; it does not use the Node API or
+save changes. From the project root:
+```bash
+python -m pip install -r requirements.txt
+python app.py
+```
+It opens at `http://127.0.0.1:5001` by default so it does not conflict with the
+Node API on port 5000. Set the `PORT` environment variable to use a different port.
 
 ### Step 4 — Login
 Use one of the seeded test accounts:

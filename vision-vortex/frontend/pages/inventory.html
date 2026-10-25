@@ -48,10 +48,10 @@
           <input type="hidden" id="invId">
           <div class="mb-2"><label class="form-label">Item Name *</label><input class="form-control" id="itemName" required></div>
           <div class="row">
-            <div class="col mb-2"><label class="form-label">Quantity</label><input type="number" class="form-control" id="quantity" value="0"></div>
+            <div class="col mb-2"><label class="form-label">Quantity</label><input type="number" class="form-control" id="quantity" value="0" min="0" max="2147483647" step="1" required></div>
             <div class="col mb-2"><label class="form-label">Unit</label><input class="form-control" id="unit" placeholder="bottles / tablets / ml"></div>
           </div>
-          <div class="mb-2"><label class="form-label">Reorder Level</label><input type="number" class="form-control" id="reorderLevel" value="5"></div>
+          <div class="mb-2"><label class="form-label">Reorder Level</label><input type="number" class="form-control" id="reorderLevel" value="5" min="0" max="2147483647" step="1" required></div>
           <button type="submit" class="btn btn-vv-primary w-100 mt-2">Save</button>
         </form>
       </div>
