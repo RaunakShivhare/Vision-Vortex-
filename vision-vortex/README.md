@@ -1,5 +1,5 @@
 # 🌱 Vision Vortex — Digital Farm Management Portal
-### (Antimicrobial Usage Tracking) — B.Tech First Year Mini Project
+### (Antimicrobial Usage Tracking) — Mini Project
 
 This is a simple full-stack web project that helps farmers and vets keep digital
 records of livestock, medicine usage (especially antimicrobials), vaccinations,
